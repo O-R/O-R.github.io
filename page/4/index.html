@@ -449,7 +449,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://o-r.github.io/2017/05/17/ubuntu常用命令/">
+    <link itemprop="mainEntityOfPage" href="https://o-r.github.io/2017/05/17/修改时区并同步时间/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Faror">
@@ -468,7 +468,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/05/17/ubuntu常用命令/" itemprop="url">ubuntu常用命令</a></h1>
+                <a class="post-title-link" href="/2017/05/17/修改时区并同步时间/" itemprop="url">ubuntu修改时区并同步时间</a></h1>
         
 
         <div class="post-meta">
@@ -552,31 +552,14 @@
 
       
         
-          
-            <h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><h2 id="apt"><a href="#apt" class="headerlink" title="apt"></a>apt</h2><h2 id="用户-用户组"><a href="#用户-用户组" class="headerlink" title="用户/用户组"></a>用户/用户组</h2><ol>
-<li>查看所有用户 <code>cat /etc/passwd</code></li>
-<li>查看所有用户组 <code>cat /etc/group</code><br>1.添加用户 <code>sudo adduser or</code></li>
-<li><p><strong>将用户添加到 sudoers</strong>  </p>
-<blockquote>
-<p>root用户下使用 <code>visudo</code><br>sudo vim /etc/sudoers </p>
-</blockquote>
-<p><strong>修改文件如下：</strong>  </p>
-<blockquote>
-<p># User privilege specification<br>root ALL=(ALL) ALL<br>or ALL=(ALL) ALL  </p>
-</blockquote>
-</li>
-</ol>
-<h2 id="进程、端口占用"><a href="#进程、端口占用" class="headerlink" title="进程、端口占用"></a>进程、端口占用</h2><ol>
-<li><code>netstat -tln</code>：查看端口占用</li>
-<li><code>lsof -i:port</code>：查看端口进程信息</li>
-<li>查看所有服务端口 <code>cat /etc/services | less</code></li>
-</ol>
-<h2 id="防火墙-ufw"><a href="#防火墙-ufw" class="headerlink" title="防火墙 ufw"></a>防火墙 <code>ufw</code></h2><h2 id="文件"><a href="#文件" class="headerlink" title="文件"></a>文件</h2><h3 id="权限-chmod"><a href="#权限-chmod" class="headerlink" title="权限 chmod"></a>权限 <code>chmod</code></h3><h3 id="列举文件-ls"><a href="#列举文件-ls" class="headerlink" title="列举文件 ls"></a>列举文件 <code>ls</code></h3><h3 id="移动-复制-剪切-mv"><a href="#移动-复制-剪切-mv" class="headerlink" title="移动/复制/剪切 mv"></a>移动/复制/剪切 <code>mv</code></h3><h3 id="删除-rm"><a href="#删除-rm" class="headerlink" title="删除 rm"></a>删除 <code>rm</code></h3><ol>
-<li>sudo apt-get purge –auto-remove packagename</li>
-</ol>
-<h3 id="解压缩-rar"><a href="#解压缩-rar" class="headerlink" title="解压缩 rar"></a>解压缩 <code>rar</code></h3><h3 id="代理测试"><a href="#代理测试" class="headerlink" title="代理测试"></a>代理测试</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 访问各大网站，若均有网页源码输出则配置成功</span><br><span class="line">curl <span class="number">-4s</span>kL https:<span class="comment">//www.baidu.com</span></span><br><span class="line">curl <span class="number">-4s</span>kL https:<span class="comment">//www.google.com</span></span><br><span class="line">curl <span class="number">-4s</span>kL https:<span class="comment">//www.google.com.hk</span></span><br><span class="line">curl <span class="number">-4s</span>kL https:<span class="comment">//www.google.co.jp</span></span><br><span class="line">curl <span class="number">-4s</span>kL https:<span class="comment">//www.youtube.com</span></span><br><span class="line">curl <span class="number">-4s</span>kL https:<span class="comment">//www.facebook.com</span></span><br><span class="line">curl <span class="number">-4s</span>kL https:<span class="comment">//www.wikipedia.org</span></span><br><span class="line"></span><br><span class="line"># 获取当前 IP 地址，应该显示本机 IP</span><br><span class="line">curl <span class="number">-4s</span>kL http:<span class="comment">//ip.chinaz.com/getip.aspx</span></span><br></pre></td></tr></table></figure>
-
-          
+          <p>ubuntu修改时区并同步时间</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/05/17/修改时区并同步时间/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1537,7 +1520,7 @@
 
                   // select top N slices in content
 
-                  var upperBound = parseInt('5');
+                  var upperBound = parseInt('1');
                   if (upperBound >= 0) {
                     slicesOfContent = slicesOfContent.slice(0, upperBound);
                   }
