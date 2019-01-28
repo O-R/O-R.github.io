@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="aspnetcore,identity,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="ASP.NET Core Identity 源码">
+<meta name="keywords" content="aspnetcore,identity">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ASP.NET Core Identity">
+<meta property="og:url" content="https://o-r.github.io/2018/04/06/Identity/index.html">
+<meta property="og:site_name" content="Faror&#39;s Blog">
+<meta property="og:description" content="ASP.NET Core Identity 源码">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-01-28T06:32:07.814Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ASP.NET Core Identity">
+<meta name="twitter:description" content="ASP.NET Core Identity 源码">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LZ9QO5RDFF',
+      apiKey: '7017d368353821d87073dc0a6b0135be',
+      indexName: 'prod_githubblog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://o-r.github.io/2018/04/06/Identity/">
+
+
+
+
+
+  <title>ASP.NET Core Identity | Faror's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Faror's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://o-r.github.io/2018/04/06/Identity/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Faror">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Faror's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ASP.NET Core Identity</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-06T22:04:15+08:00">
+                2018-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/aspnetcore/" itemprop="url" rel="index">
+                    <span itemprop="name">aspnetcore</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/aspnetcore/源码揭秘/" itemprop="url" rel="index">
+                    <span itemprop="name">源码揭秘</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>ASP.NET Core Identity 源码<br><a id="more"></a></p>
+<h1 id="ASP-NET-Core-Identity"><a href="#ASP-NET-Core-Identity" class="headerlink" title="ASP.NET Core Identity"></a>ASP.NET Core Identity</h1><h2 id="怎么用"><a href="#怎么用" class="headerlink" title="怎么用"></a>怎么用</h2><ol>
+<li><p>StartUp</p>
+<ul>
+<li><p>ConfigureServices</p>
+  <figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public void ConfigureServices(IServiceCollection services)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//EF 配置</span></span><br><span class="line">    services.AddDbContext<span class="params">&lt;ApplicationDbContext&gt;</span>(options =&gt;</span><br><span class="line">        options.UseSqlite(Configuration.GetConnectionString(<span class="string">"DefaultConnection"</span>)));</span><br><span class="line"></span><br><span class="line">    <span class="comment">//注入Identity依赖</span></span><br><span class="line">    services.AddIdentity<span class="params">&lt;ApplicationUser, IdentityRole&gt;</span>()</span><br><span class="line">        .AddEntityFrameworkStores<span class="params">&lt;ApplicationDbContext&gt;</span>()</span><br><span class="line">        .AddDefaultTokenProviders();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//以下不重要....跟Identity无关</span></span><br><span class="line">    <span class="comment">//Add application services.</span></span><br><span class="line">    services.AddTransient<span class="params">&lt;IEmailSender, EmailSender&gt;</span>();</span><br><span class="line"></span><br><span class="line">    services.AddMvc();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Configure</p>
+  <figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">public</span> <span class="selector-tag">void</span> <span class="selector-tag">Configure</span>(IApplicationBuilder app, IHostingEnvironment env)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="selector-tag">if</span> (env.IsDevelopment())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="selector-tag">app</span><span class="selector-class">.UseDeveloperExceptionPage</span>();</span><br><span class="line">        <span class="selector-tag">app</span><span class="selector-class">.UseDatabaseErrorPage</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="selector-tag">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="selector-tag">app</span><span class="selector-class">.UseExceptionHandler</span>(<span class="string">"/Home/Error"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="selector-tag">app</span><span class="selector-class">.UseStaticFiles</span>();</span><br><span class="line"></span><br><span class="line">    <span class="selector-tag">app</span><span class="selector-class">.UseAuthentication</span>();</span><br><span class="line"></span><br><span class="line">    <span class="selector-tag">app</span><span class="selector-class">.UseMvc</span>(routes =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="selector-tag">routes</span><span class="selector-class">.MapRoute</span>(</span><br><span class="line">            <span class="attribute">name</span>: <span class="string">"default"</span>,</span><br><span class="line">            <span class="attribute">template</span>: <span class="string">"&#123;controller=Home&#125;/&#123;action=Index&#125;/&#123;id?&#125;"</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>三大核心对象</p>
+<ul>
+<li><p><strong>SignInManager</strong>： 主要处理注册登录相关业务逻辑。</p>
+<p>  e.g.</p>
+<ul>
+<li><p>用户密码登录</p>
+  <figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> <span class="keyword">result</span> = <span class="keyword">await</span> _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: <span class="keyword">false</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注册并登录</p>
+  <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">var<span class="built_in"> user </span>= new ApplicationUser &#123; UserName = model.Email, Email = model.Email &#125;;</span><br><span class="line">var result = await _userManager.CreateAsync(user, model.Password);</span><br><span class="line"><span class="keyword">if</span> (result.Succeeded)</span><br><span class="line">&#123;</span><br><span class="line">    _logger.LogInformation(<span class="string">"User created a new account with password."</span>);</span><br><span class="line"></span><br><span class="line">    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);</span><br><span class="line">    var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);</span><br><span class="line">    await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);</span><br><span class="line"></span><br><span class="line">    await _signInManager.SignInAsync(user, isPersistent: <span class="literal">false</span>);</span><br><span class="line">    _logger.LogInformation(<span class="string">"User created a new account with password."</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p><strong>UserManager</strong>： 处理用户相关添加删除，修改密码，添加删除角色等。</p>
+<p>  e.g.</p>
+<ul>
+<li><p>创建用户</p>
+  <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var<span class="built_in"> user </span>= new ApplicationUser &#123; UserName = model.Email, Email = model.Email &#125;;</span><br><span class="line">var result = await _userManager.CreateAsync(user, model.Password);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询用户</p>
+  <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var<span class="built_in"> user </span>= await _userManager.FindByIdAsync(userId);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p><strong>RoleManager</strong>：角色相关添加删除更新等。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><ol>
+<li><p>StartUp</p>
+<ul>
+<li><p>ConfigureServices</p>
+  <figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">services.AddIdentity&lt;ApplicationUser, IdentityRole&gt;<span class="params">()</span>;</span><br><span class="line"></span><br><span class="line"><span class="string">//</span>以上代码主要实现如下：</span><br><span class="line">services.AddAuthentication<span class="params">(<span class="attr">options</span> =&gt;</span></span><br><span class="line"><span class="params">&#123;</span></span><br><span class="line"><span class="params">    options.<span class="attr">DefaultAuthenticateScheme</span> = IdentityConstants.ApplicationScheme;</span></span><br><span class="line"><span class="params">    options.<span class="attr">DefaultChallengeScheme</span> = IdentityConstants.ApplicationScheme;</span></span><br><span class="line"><span class="params">    options.<span class="attr">DefaultSignInScheme</span> = IdentityConstants.ExternalScheme;</span></span><br><span class="line"><span class="params">&#125;)</span></span><br><span class="line"><span class="string">.AddCookie</span><span class="params">(IdentityConstants.ApplicationScheme, <span class="attr">o</span> =&gt;</span></span><br><span class="line"><span class="params">&#123;</span></span><br><span class="line"><span class="params">    o.<span class="attr">LoginPath</span> = new PathString("/Account/Login")</span>;</span><br><span class="line">    o.Events = new CookieAuthenticationEvents</span><br><span class="line">    &#123;</span><br><span class="line">        OnValidatePrincipal = SecurityStampValidator.ValidatePrincipalAsync</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;)</span><br><span class="line"><span class="string">.AddCookie</span><span class="params">(IdentityConstants.ExternalScheme, <span class="attr">o</span> =&gt;</span></span><br><span class="line"><span class="params">&#123;</span></span><br><span class="line"><span class="params">    o.Cookie.<span class="attr">Name</span> = IdentityConstants.ExternalScheme;</span></span><br><span class="line"><span class="params">    o.<span class="attr">ExpireTimeSpan</span> = TimeSpan.FromMinutes(5)</span>;</span><br><span class="line">&#125;)</span><br><span class="line"><span class="string">.AddCookie</span><span class="params">(IdentityConstants.TwoFactorRememberMeScheme,</span></span><br><span class="line"><span class="params">    <span class="attr">o</span> =&gt; o.Cookie.<span class="attr">Name</span> = IdentityConstants.TwoFactorRememberMeScheme)</span></span><br><span class="line"><span class="string">.AddCookie</span><span class="params">(IdentityConstants.TwoFactorUserIdScheme, <span class="attr">o</span> =&gt;</span></span><br><span class="line"><span class="params">&#123;</span></span><br><span class="line"><span class="params">    o.Cookie.<span class="attr">Name</span> = IdentityConstants.TwoFactorUserIdScheme;</span></span><br><span class="line"><span class="params">    o.<span class="attr">ExpireTimeSpan</span> = TimeSpan.FromMinutes(5)</span>;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="string">//..........................................................</span></span><br><span class="line"></span><br><span class="line"><span class="string">//</span>错误信息描述</span><br><span class="line">services.TryAddScoped&lt;IdentityErrorDescriber&gt;<span class="params">()</span>;</span><br><span class="line"></span><br><span class="line"><span class="string">//..........................................................</span></span><br><span class="line"></span><br><span class="line">services.TryAddScoped&lt;UserManager&lt;TUser&gt;, AspNetUserManager&lt;TUser&gt;&gt;<span class="params">()</span>;</span><br><span class="line">services.TryAddScoped&lt;SignInManager&lt;TUser&gt;, SignInManager&lt;TUser&gt;&gt;<span class="params">()</span>;</span><br><span class="line">services.TryAddScoped&lt;RoleManager&lt;TRole&gt;, AspNetRoleManager&lt;TRole&gt;&gt;<span class="params">()</span>;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p><code>services.AddAuthentication</code> 主要注入了 <code>IAuthenticationService</code> ， <code>IAuthenticationHandlerProvider</code> ， <code>IAuthenticationSchemeProvider</code> 几个重要的实例</p>
+ <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">services.TryAddScoped<span class="tag">&lt;<span class="name">IAuthenticationService,</span> <span class="attr">AuthenticationService</span>&gt;</span>();</span><br><span class="line"></span><br><span class="line">services.TryAddScoped<span class="tag">&lt;<span class="name">IAuthenticationHandlerProvider,</span> <span class="attr">AuthenticationHandlerProvider</span>&gt;</span>();</span><br><span class="line">services.TryAddSingleton<span class="tag">&lt;<span class="name">IAuthenticationSchemeProvider,</span> <span class="attr">AuthenticationSchemeProvider</span>&gt;</span>();</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>IAuthenticationService</code></p>
+<p>  用来实现 <code>HttpContext</code> 下的几个扩展方法：<code>Authenticate/Challenge/Forbid/SignIn/SignOut</code></p>
+</li>
+<li><p><code>IAuthenticationSchemeProvider</code></p>
+<p>  <code>IAuthenticationService</code> 会先根据 <code>IAuthenticationSchemeProvider</code> 获取指定的 <code>AuthenticationScheme</code>(认证方案)</p>
+<p>  <code>AuthenticationScheme</code> 有三个主要属性 <code>Name</code> (方案名称) , <code>DisplayName</code> , <code>HandlerType</code> (<code>AuthenticationHandler</code>的类型)</p>
+</li>
+<li><p><code>IAuthenticationHandlerProvider</code></p>
+<p>  <code>IAuthenticationHandlerProvider</code> 根据指定的 <code>AuthenticationScheme</code> (认证方案) 的 <code>HandlerType</code> 属性获取到 <code>AuthenticationHandler</code></p>
+<p>以下是一个 <code>AuthenticationService</code> 中 <code>SignInAsync</code> 的实现</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">async</span> Task <span class="title">SignInAsync</span>(<span class="params">HttpContext context, <span class="keyword">string</span> scheme, ClaimsPrincipal principal, AuthenticationProperties properties</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (principal == <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentNullException(<span class="keyword">nameof</span>(principal));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (scheme == <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//通过 AuthenticationSchemeProvider 获取 DefaultSignInScheme</span></span><br><span class="line">        <span class="keyword">var</span> defaultScheme = <span class="keyword">await</span> Schemes.GetDefaultSignInSchemeAsync();</span><br><span class="line">        scheme = defaultScheme?.Name;</span><br><span class="line">        <span class="keyword">if</span> (scheme == <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InvalidOperationException(<span class="string">$"No authenticationScheme was specified, and there was no DefaultSignInScheme found."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//通过 AuthenticationHandlerProvider 获取到 DefaultSignInScheme 对应的AuthenticationHandlerProvider</span></span><br><span class="line">    <span class="keyword">var</span> handler = <span class="keyword">await</span> Handlers.GetHandlerAsync(context, scheme) <span class="keyword">as</span> IAuthenticationSignInHandler;</span><br><span class="line">    <span class="keyword">if</span> (handler == <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> InvalidOperationException(<span class="string">$"No IAuthenticationSignInHandler is configured to handle sign in for the scheme: <span class="subst">&#123;scheme&#125;</span>"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">await</span> handler.SignInAsync(principal, properties);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p><code>AddCookie</code></p>
+<p> <code>AddCookie</code> 会将 <code>CookieAuthenticationHandler</code> 作为 <code>AuthenticationScheme</code> 的 <code>HandlerType</code></p>
+ <figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static AuthenticationBuilder <span class="keyword">AddCookie(this </span>AuthenticationBuilder <span class="keyword">builder, </span>string authenticationScheme, string <span class="keyword">displayName, </span>Action&lt;CookieAuthenticationOptions&gt; configureOptions)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton&lt;IPostConfigureOptions&lt;CookieAuthenticationOptions&gt;, </span>PostConfigureCookieAuthenticationOptions&gt;())<span class="comment">;</span></span><br><span class="line">    return <span class="keyword">builder.AddScheme&lt;CookieAuthenticationOptions, </span>CookieAuthenticationHandler&gt;(authenticationScheme, <span class="keyword">displayName, </span>configureOptions)<span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 将 <code>AuthenticationScheme</code> 添加到 <code>AuthenticationOptions</code> 中。</p>
+<p> <code>AuthenticationOptions</code> 会将 <code>AuthenticationScheme</code> 添加到 <code>Schemes</code> 和 <code>SchemeMap</code> 两个属性。<code>AuthenticationSchemeProvider</code> 也是通过这两个属性获取到 <code>AuthenticationScheme</code> 的。</p>
+ <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Summary:</span></span><br><span class="line"><span class="comment">//     Returns the schemes in the order they were added (important for request handling</span></span><br><span class="line"><span class="comment">//     priority)</span></span><br><span class="line"><span class="keyword">public</span> IEnumerable&lt;AuthenticationSchemeBuilder&gt; Schemes &#123; <span class="keyword">get</span>; &#125;</span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Summary:</span></span><br><span class="line"><span class="comment">//     Maps schemes by name.</span></span><br><span class="line"><span class="keyword">public</span> IDictionary&lt;<span class="keyword">string</span>, AuthenticationSchemeBuilder&gt; SchemeMap &#123; <span class="keyword">get</span>; &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Summary:</span></span><br><span class="line"><span class="comment">//     Adds an Microsoft.AspNetCore.Authentication.AuthenticationScheme.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Parameters:</span></span><br><span class="line"><span class="comment">//   name:</span></span><br><span class="line"><span class="comment">//     The name of the scheme being added.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//   configureBuilder:</span></span><br><span class="line"><span class="comment">//     Configures the scheme.</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddScheme</span>(<span class="params"><span class="keyword">string</span> name, Action&lt;AuthenticationSchemeBuilder&gt; configureBuilder</span>)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><p>Configure</p>
+</li>
+</ul>
+</li>
+<li><p>三大核心对象</p>
+<ul>
+<li><p>实现原理</p>
+<p>  先看下 <code>SignManager</code> 下 <code>SignIn/Out</code> 的实现</p>
+  <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">async</span> Task <span class="title">SignInAsync</span>(<span class="params">TUser user, AuthenticationProperties authenticationProperties, <span class="keyword">string</span> authenticationMethod = <span class="literal">null</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> userPrincipal = <span class="keyword">await</span> CreateUserPrincipalAsync(user);</span><br><span class="line">    <span class="comment">// Review: should we guard against CreateUserPrincipal returning null?</span></span><br><span class="line">    <span class="keyword">if</span> (authenticationMethod != <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        userPrincipal.Identities.First().AddClaim(<span class="keyword">new</span> Claim(ClaimTypes.AuthenticationMethod, authenticationMethod));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">await</span> Context.SignInAsync(IdentityConstants.ApplicationScheme,</span><br><span class="line">        userPrincipal,</span><br><span class="line">        authenticationProperties ?? <span class="keyword">new</span> AuthenticationProperties());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Signs the current user out of the application.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">async</span> Task <span class="title">SignOutAsync</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">await</span> Context.SignOutAsync(IdentityConstants.ApplicationScheme);</span><br><span class="line">    <span class="keyword">await</span> Context.SignOutAsync(IdentityConstants.ExternalScheme);</span><br><span class="line">    <span class="keyword">await</span> Context.SignOutAsync(IdentityConstants.TwoFactorUserIdScheme);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  没错，最终都是调用 <code>HttpContext</code> 下的扩展方法实现，而这些扩展方法是通过 <code>AuthenticationService</code> 实现的， <code>AuthenticationService</code> 又是根据 <code>AuthenticationScheme</code> 中的 <code>AuthenticationHandler</code> 来实现。最终，这里是由 <code>CookieAuthenticationHandler</code> 来实现</p>
+</li>
+<li><p>怎么实现数据持久化</p>
+<p>  通过 <code>Microsoft.AspNetCore.Identity.EntityFrameworkCore</code></p>
+  <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">services.AddEntityFrameworkStores<span class="tag">&lt;<span class="name">ApplicationDbContext</span>&gt;</span>()</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>本地化提示信息</p>
+<p> 可以在 <code>AddIdentity</code> 的实现中找到以下代码，<code>IdentityErrorDescriber</code> 用于错误提示。（e.g. 用户名和密码不匹配的提示）。</p>
+<p> 现在全都是英文提示，注意到注入方法 <code>TryAddScoped</code> （如果已经注入过此类型，不再注入），可以在<code>AddIdentity</code> 之前注入自己重写的 <code>IdentityErrorDescriber</code>，比如 <code>ChineseIdentityErrorDescriber</code></p>
+ <figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//错误信息描述</span></span><br><span class="line">services.TryAddScoped<span class="params">&lt;IdentityErrorDescriber&gt;</span>();</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><ul>
+<li><a href="https://github.com/aspnet/Security/issues/1310" target="_blank" rel="noopener">Auth 2.0 Migration announcement</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/aspnetcore/" rel="tag"># aspnetcore</a>
+          
+            <a href="/tags/identity/" rel="tag"># identity</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/05/Options/" rel="next" title="AspNetCore 配置--Options">
+                <i class="fa fa-chevron-left"></i> AspNetCore 配置--Options
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/07/OAuth2/" rel="prev" title="OAuth2 协议">
+                OAuth2 协议 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Faror">
+          <p class="site-author-name" itemprop="name">Faror</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ASP-NET-Core-Identity"><span class="nav-number">1.</span> <span class="nav-text">ASP.NET Core Identity</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#怎么用"><span class="nav-number">1.1.</span> <span class="nav-text">怎么用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原理"><span class="nav-number">1.2.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.3.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Faror</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('5');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
