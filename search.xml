@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[流水号设计（美团LeafSegment）]]></title>
+    <url>%2F2019%2F01%2F29%2F%E6%B5%81%E6%B0%B4%E5%8F%B7%E8%AE%BE%E8%AE%A1%EF%BC%88%E7%BE%8E%E5%9B%A2LeafSegment%EF%BC%89%2F</url>
+    <content type="text"><![CDATA[多线程生成流水号 设计思路 关键代码123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657/// &lt;summary&gt;/// 获取下一个Id/// &lt;/summary&gt;/// &lt;returns&gt;&lt;/returns&gt;public long NextId()&#123; lock (_lock) &#123; long result = 0; //开启线程尝试获取数据 _fill.Set(); while (!_data.TryDequeue(out result)) &#123; //等待子线程 _fillDone.WaitOne(); &#125; return result; &#125;&#125;private void Loop()&#123; (new Thread(_ =&gt; &#123; while (true) &#123; _fill.WaitOne(); if (FillData()) &#123; //通知主线程数据获取成功 _fillDone.Set(); &#125; &#125; &#125;) &#123; IsBackground = true &#125;).Start();&#125;private bool FillData()&#123; bool isFill = false; //数量小于步长一半时触发拉新 while (_data.Count &lt; (_currentStep &gt;&gt; 1)) &#123; isFill = true; var segment = _increment.Invoke(_bizTag); _currentStep = segment.Step; for (var i = segment.MaxId - segment.Step + 1; i &lt;= segment.MaxId; i++) &#123; _data.Enqueue(i); &#125; &#125; return isFill;&#125; 性能测试压测的两个请求： 12345678910111213141516171819202122232425262728293031323334[Route(&quot;api/[controller]&quot;)][ApiController]public class ValuesController : ControllerBase&#123; private readonly IBusinessId _bussinessId; public ValuesController(IBusinessId businessId) &#123; _bussinessId = businessId; &#125; /// &lt;summary&gt; /// 获取流水号 /// &lt;/summary&gt; /// &lt;param name=&quot;count&quot;&gt;&lt;/param&gt; /// &lt;returns&gt;&lt;/returns&gt; [HttpGet] public ActionResult&lt;IEnumerable&lt;string&gt;&gt; Get(int count) &#123; return _bussinessId.GetMany(&quot;test_01&quot;, count); &#125; /// &lt;summary&gt; /// 空请求 /// &lt;/summary&gt; /// &lt;returns&gt;&lt;/returns&gt; [HttpGet] [Route(&quot;test&quot;)] public ActionResult&lt;int&gt; Test() &#123; return 1; &#125;&#125; 本机压测结果（8C 8GB SSD 戴尔笔记本） 200线程持续100次，吞吐量接近2000/s,接近空请求 腾讯云学生机（1C 2GB 1Mbps、普通云硬盘、docker环境）压测结果 200线程持续100次，吞吐量接近450/s,接近空请求 源码下载LeafSegment.rar]]></content>
+      <categories>
+        <category>业务设计</category>
+      </categories>
+      <tags>
+        <tag>id</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[rancher-记一次无法启动]]></title>
     <url>%2F2019%2F01%2F28%2Francher-%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%2F</url>
     <content type="text"><![CDATA[docker容器日志过多，导致磁盘空间耗尽。从而rancher server无法启动。记录关键命令。 查看容器相关信息: docker inspect 容器id 查看磁盘占用大小信息： df -h 查看目录占用总大小: du -hs 目录 列举容器日志大小：ls -lh $(find /var/lib/docker/containers/ -name *-json.log) 清除日志脚本 1234567891011121314#!/bin/shecho "==================== start clean docker containers logs =========================="logs=$(find /var/lib/docker/containers/ -name *-json.log)for log in $logs do echo "clean logs : $log" cat /dev/null &gt; $log doneecho "==================== end clean docker containers logs ==========================" 查看容器日志脚本 123456789echo "======== docker containers logs file size ========" logs=$(find /var/lib/docker/containers/ -name *-json.log) for log in $logs do ls -lh $log done]]></content>
@@ -61,8 +72,8 @@
         <category>开发环境</category>
       </categories>
       <tags>
-        <tag>gogs</tag>
         <tag>git</tag>
+        <tag>gogs</tag>
       </tags>
   </entry>
   <entry>
@@ -185,8 +196,8 @@
       </categories>
       <tags>
         <tag>linux</tag>
-        <tag>centos</tag>
         <tag>rabbitmq</tag>
+        <tag>centos</tag>
       </tags>
   </entry>
   <entry>
@@ -200,8 +211,8 @@
       </categories>
       <tags>
         <tag>linux</tag>
-        <tag>centos</tag>
         <tag>rabbitmq</tag>
+        <tag>centos</tag>
       </tags>
   </entry>
   <entry>
@@ -349,6 +360,32 @@
       </tags>
   </entry>
   <entry>
+    <title><![CDATA[Ubuntu 14.04下安装和配置ShadowSocks服务器]]></title>
+    <url>%2F2017%2F05%2F17%2Fss%2F</url>
+    <content type="text"><![CDATA[Ubuntu 14.04下安装和配置ShadowSocks服务器 ShadowSocks服务器的安装、配置、运行、停止 Ubuntu 14.04下安装和配置ShadowSocks服务器安装ShadowSocks服务器在Ubuntu下安装ShadowSocks服务器端其实很简单，只需要键入下面几条命令就可以了： 1234sudo apt-get update sudo apt-get install python-gevent python-pip sudo pip install shadowsocks apt-get install python-m2crypto 配置ShadowSocks服务器ShadowSocks服务器的配置文件可以放到任何你想放的位置，起任何的名字。出于习惯，可以将其放在/etc目录下，名字为shadowsocks.json： 1vim /etc/shadowsocks.json 在编辑器里面修改文件内容为： 12345678&#123; "server":"serverip", "server_port":8388, "local_port":1080, "password":"Your Password", "timeout":600, "method":"aes-256-cfb" &#125; 你可以更改“server_port”字段，修改ShadowSocks服务器的端口。还有“method”字段指定的是加密算法，ShadowSocks服务器支持多种加密算法（aes-256-cfb，aes-192-cfb，aes-128-cfb，rc4-md5，des-cfb等等），可以根据需要自己配置。 运行ShadowSocks服务器注意ShadowSocks服务器要在root用户下运行，所以一开始请切换用户。然后只需要输入下面的命令就可以了： 1ssserver -c /etc/shadowsocks.json -d start -c参数用来指定ShadowSocks服务器端配置文件的路径，只要设置成前一步修改的配置文件的路径名就好了。 停止ShadowSocks服务器同样要在root用户下，执行下面的命令即可： 1ssserver -c /etc/shadowsocks.json -d stop SS客户端下载地址 github地址 其他下载地址 谷歌插件 SwitchyOmega]]></content>
+      <categories>
+        <category>linux</category>
+        <category>ubuntu</category>
+      </categories>
+      <tags>
+        <tag>ubuntu</tag>
+        <tag>ss</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[ubuntu_系统常规配置]]></title>
+    <url>%2F2017%2F05%2F17%2Fubuntu_%E7%B3%BB%E7%BB%9F%E5%B8%B8%E8%A7%84%E9%85%8D%E7%BD%AE%2F</url>
+    <content type="text"><![CDATA[ubuntu 文件传输、语言环境、远程桌面安装 系统常规配置文件传输安装 lrzsz 1apt install lrzsz bash命令行输入 rz -e ：打开当前终端文件进行传输 sz -e 文件在远程机器上路径:打开当前终端选择下载文件位置 语言环境bash终端 查看当前系统的语言环境 locale 查看当前系统已安装的语言 locale -a 切换（并自动安装）对应选择的默认语言 sudo dpkg-reconfigure locales 安装缺少的语言 sudo locale-gen zh_CN.UTF-8 编辑配置文件 1234ubuntu@VM-14-193-ubuntu:~$ vim ~/.profile# 添加下面内容export LANG="zh_CN.UTF-8"export LC_ALL="zh_CN.UTF-8" 远程桌面安装文泉驿字体 apt install wqy* -y xfce4 解压缩工具安装命令: 1apt install thunar-archive-plugin -y 文本编辑器安装命令: 1apt install gedit -y 或 1apt install mousepad -y xfce4 软件包列表其中依赖必需的包在你执行apt-get iinstall xfce4的时候就已经完成安装了 除了Lib库文件、主要有以下的包 1234567891011121314151617gtk2-engines-xfce GTK+-2.0 对于Xfce的主题显示支持 orage Xfce 桌面环境的日历和时间管理thunar Xfce 的文件管理器 xfce4-appfinder Xfce中运行命令和应用程序查找、就是应用程序菜单第一个项目xfce4-mixer Xfce中的混音器、简单说就是音量外放和话题之类的控制xfce4-panel Xfce中的面板管理器xfce4-session Xfce中的会话管理器 xfce4-settings Xfce中的设置（是指图形界面的设置、就是打开菜单能看到的那个设置）xfce4-utils Xfce中各个方面的工具xfconf Xfce设置管理器中的实用工具xfdesktop4 xfce的桌面背景、图标、还有菜单管理都由这个提供xfwm4 Xfce中的视窗管理器desktop-base Debian 桌面环境的公共基础tango-icon-theme Tango 主题图标 thunar-volman Thunar 文件管理器的音量控制扩展 xfce4-notifyd 可视化的通知守护进程 以上这些软件包是你在安装Xfce4的时候因为依赖安装的包、其中最后的三个在Debian软件仓库里面是提示推荐的包。 下面说下Xfce中可以用来扩充功能的包、就是这些包在最小化配置的时候不会默认安装好、但是没有它们有些功能不能使用 xfprint4 Xfce4 桌面环境下使用的打印机管理器。 Xfce4-goodies是由下面的包填充的、也就是说、你安装 xfce4-goodies其实是安装的下面这些软件包 12345678910111213141516171819202122232425262728293031323334353637383940414243444546xfce4-artwork Xfce桌面环境美化的扩展包、会安装一些图标、主题、壁纸xfce4-battery-plugin 电池电量的显示器xfce4-clipman-plugin 剪切板历史记录查看xfce4-cpufreq-plugin 设置CPU频率xfce4-cpugraph-plugin CPU利用率查看xfce4-datetime-plugin 日期和时间插件xfce4-diskperf-plugin 磁盘情况监控xfce4-fsguard-plugin 文件系统监控xfce4-genmon-plugin 显示一些命令提示xfce4-mailwatch-plugin 邮件通知xfce4-mount-plugin 挂载管理xfce4-netload-plugin 网络xfce4-notes-plugin 笔记xfce4-places-plugin 快速管理收藏夹、最近使用、可移除驱动器xfce4-quicklaunchers 快速启动xfce4-sensors-plugin 传感器、可以查看硬件温度xfce4-smartbookmark-plugin 收藏夹xfce4-systemload-plugin 系统加载项查看xfce4-timer-plugin 计时器xfce4-verve-plugin 提供命令记忆功能xfce4-wavelan-plugin 无线网运行情况xfce4-weather-plugin 天气预报xfce4-xkb-plugin 键盘配置thunar-archive-plugin 压缩文件的解压插件thunar-media-tags-plugin 提供媒体文件标签功能mousepad 一个简单的文本编辑器ristretto 图像查看器xfburn DVD刻录软件xfce4-dict 词典xfce4-notifyd 通知xfce4-screenshooter 截图xfce4-taskmanager 任务管理器xfce4-terminal 终端xfce4-cellmodem-plugin 调制解调器xfce4-linelight-plugin 一个搜索程序xfce4-messenger-plugin DBus消息通知xfce4-minicmd-plugin 额外的终端软件xfce4-mpc-plugin, xfmpc Music Player Daemon播放器守护程序，管理播放列表和音乐数据库xfce4-radio-plugin 收音机插件xfce4-xfapplet-plugin 提供GNOME环境中的一些小应用程序支持xfswitch-plugin 用户快速切换xfce4-hdaps ThinkPads的HDAPS插件thunar-thumbnailers 为文件管理器提供图像预览功能gigolo GIO/GVfs虚拟文件系统的远程管理前端parole 视频播放器xfce4-power-manager 电源管理 以上软件包可以单独安装的、所以看你需要添加即可]]></content>
+      <categories>
+        <category>linux</category>
+        <category>ubuntu</category>
+      </categories>
+      <tags>
+        <tag>linux</tag>
+        <tag>ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[ubuntu_登录]]></title>
     <url>%2F2017%2F05%2F17%2Fubuntu_%E7%99%BB%E5%BD%95%2F</url>
     <content type="text"><![CDATA[ubuntu 使用 ssh 远程登录 一、 登录1. 生成SSH密钥生成命令：1ssh-keygen -t rsa -b 2048 查看密钥(位于C:\Users\当前windows用户\AppData\Local\lxss\home\ssh用户\.ssh)1cat ~/.ssh/id_rsa.pub 使用 ssh-agent 来存储私钥密码(这种方法好像并没什么卵用)为了避免在每次 SSH 登录时键入私钥文件密码，可以使用 ssh-agent 来缓存私钥文件密码。 如果使用 Mac，OSX Keychain 在用户调用 ssh-agent时会安全存储私钥密码。 验证并使用 ssh-agent 和 ssh-add 将密钥文件的情况通知给 SSH 系统，使密码不需以交互方式使用。 1eval "$(ssh-agent -s)" 现在，使用命令 ssh-add 将私钥添加到 ssh-agent。 1ssh-add ~/.ssh/id_rsa 私钥密码现在存储在 ssh-agent 中。 使用 ssh-copy-id 将密钥复制到现有 VM如果已创建 VM，则可使用以下命令将新的 SSH 公钥安装到 Linux VM： 1ssh-copy-id -i ~/.ssh/id_rsa.pub ahmet@myserver 注意：遇到无法连接22端口，可能未安装openssh-server 安装命令： 12sudo apt-get install openssh-serversudo /etc/init.d/ssh restart（重新启动ssh服务） 创建并配置 SSH 配置文件建议的最佳做法是，创建并配置 ~/.ssh/config 文件，以便加速登录和优化 SSH 客户端行为。以下示例显示了标准配置。 创建文件 1touch ~/.ssh/config 编辑文件以添加新的 SSH 配置： 1vim ~/.ssh/config 示例 ~/.ssh/config 文件： 123456789101112131415# Azure KeysHost fedora22 Hostname 102.160.203.241 User ahmet# ./Azure Keys# Default SettingsHost * PubkeyAuthentication=yes IdentitiesOnly=yes ServerAliveInterval=60 ServerAliveCountMax=30 ControlMaster auto ControlPath ~/.ssh/SSHConnections/ssh-%r@%h:%p ControlPersist 4h IdentityFile ~/.ssh/id_rsa 此 SSH 配置可以指定每个服务器的部分，以便每个服务器使用自己的专用密钥对。 默认设置 (Host *) 适用于不匹配配置文件中更高级别特定主机的任何主机。配置文件解释 Host = 在终端上调用的主机的名称。 ssh fedora22 告知 SSH 使用标记为 Host fedora22 的设置块中的值。注意：主机可以是符合用途的任何标签，并不代表任何服务器的实际主机名。 Hostname 102.160.203.241 = 所访问的服务器的 IP 地址或 DNS 名称。 User ahmet = 登录到服务器时要使用的远程用户帐户。 PubKeyAuthentication yes = 告知 SSH 要使用 SSH 密钥来登录。 IdentityFile /home/ahmet/.ssh/id_id_rsa = 要用于身份验证的 SSH 私钥和对应的公钥。 在不提供密码的情况下使用 SSH 连接到 Linux获得 SSH 密钥对并配置 SSH 配置文件后，便可以快速安全地登录到 Linux VM 了。 首次使用 SSH 密钥登录到服务器时，命令会提示用户输入该密钥文件的通行短语。 1ssh fedora22 命令解释 执行 ssh fedora22 后，SSH 先从 Host fedora22 块中找到并加载所有设置，并从最后一个块 (Host *) 中加载所有剩余设置。 2、远程桌面登录使用 apt 安装轻型 xfce4 桌面环境12sudo apt-get updatesudo apt-get install xfce4 安装和配置远程桌面服务器安装桌面环境后，请配置远程桌面服务来侦听传入连接。 xrdp 是大多数 Linux 分发版中提供的开源远程桌面协议 (RDP) 服务器，可与 xfce 完美配合。 在 Ubuntu VM 上安装 xrdp，如下所示： 1sudo apt-get install xrdp 告诉 xrdp 在启动会话时要使用的桌面环境。 配置 xrdp 以使用 xfce 作为桌面环境，如下所示： 1echo xfce4-session &gt;~/.xsession 重新启动 xrdp 服务使更改生效，如下所示： 1sudo service xrdp restart 设置本地用户帐户密码 如果在创建 VM 时已为用户帐户创建密码，请跳过此步骤。 如果仅使用 SSH 密钥身份验证，并且未设置本地帐户密码，请在使用 xrdp 之前指定密码以登录到 VM。 xrdp 无法接受使用 SSH 密钥进行身份验证。 以下示例为用户帐户 azureuser 指定密码： 1sudo passwd azureuser 备注 :指定密码不会将 SSHD 配置更新为允许密码登录（如果当前不允许）。 为远程桌面流量创建网络安全组规则若要允许远程桌面流量到达 Linux VM，需要创建网络安全组规则以允许端口 3389 上的 TCP 访问 VM。至此，就可以用windows远程桌面登录了]]></content>
@@ -363,35 +400,9 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[Ubuntu 14.04下安装和配置ShadowSocks服务器]]></title>
-    <url>%2F2017%2F05%2F17%2Fss%2F</url>
-    <content type="text"><![CDATA[Ubuntu 14.04下安装和配置ShadowSocks服务器 ShadowSocks服务器的安装、配置、运行、停止 Ubuntu 14.04下安装和配置ShadowSocks服务器安装ShadowSocks服务器在Ubuntu下安装ShadowSocks服务器端其实很简单，只需要键入下面几条命令就可以了： 1234sudo apt-get update sudo apt-get install python-gevent python-pip sudo pip install shadowsocks apt-get install python-m2crypto 配置ShadowSocks服务器ShadowSocks服务器的配置文件可以放到任何你想放的位置，起任何的名字。出于习惯，可以将其放在/etc目录下，名字为shadowsocks.json： 1vim /etc/shadowsocks.json 在编辑器里面修改文件内容为： 12345678&#123; "server":"serverip", "server_port":8388, "local_port":1080, "password":"Your Password", "timeout":600, "method":"aes-256-cfb" &#125; 你可以更改“server_port”字段，修改ShadowSocks服务器的端口。还有“method”字段指定的是加密算法，ShadowSocks服务器支持多种加密算法（aes-256-cfb，aes-192-cfb，aes-128-cfb，rc4-md5，des-cfb等等），可以根据需要自己配置。 运行ShadowSocks服务器注意ShadowSocks服务器要在root用户下运行，所以一开始请切换用户。然后只需要输入下面的命令就可以了： 1ssserver -c /etc/shadowsocks.json -d start -c参数用来指定ShadowSocks服务器端配置文件的路径，只要设置成前一步修改的配置文件的路径名就好了。 停止ShadowSocks服务器同样要在root用户下，执行下面的命令即可： 1ssserver -c /etc/shadowsocks.json -d stop SS客户端下载地址 github地址 其他下载地址 谷歌插件 SwitchyOmega]]></content>
-      <categories>
-        <category>linux</category>
-        <category>ubuntu</category>
-      </categories>
-      <tags>
-        <tag>ubuntu</tag>
-        <tag>ss</tag>
-      </tags>
-  </entry>
-  <entry>
     <title><![CDATA[ubuntu常用命令]]></title>
     <url>%2F2017%2F05%2F17%2Fubuntu%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%2F</url>
     <content type="text"><![CDATA[常用命令apt用户/用户组 查看所有用户 cat /etc/passwd 查看所有用户组 cat /etc/group1.添加用户 sudo adduser or 将用户添加到 sudoers root用户下使用 visudosudo vim /etc/sudoers 修改文件如下： # User privilege specificationroot ALL=(ALL) ALLor ALL=(ALL) ALL 进程、端口占用 netstat -tln：查看端口占用 lsof -i:port：查看端口进程信息 查看所有服务端口 cat /etc/services | less 防火墙 ufw文件权限 chmod列举文件 ls移动/复制/剪切 mv删除 rm sudo apt-get purge –auto-remove packagename 解压缩 rar代理测试1234567891011# 访问各大网站，若均有网页源码输出则配置成功curl -4skL https://www.baidu.comcurl -4skL https://www.google.comcurl -4skL https://www.google.com.hkcurl -4skL https://www.google.co.jpcurl -4skL https://www.youtube.comcurl -4skL https://www.facebook.comcurl -4skL https://www.wikipedia.org# 获取当前 IP 地址，应该显示本机 IPcurl -4skL http://ip.chinaz.com/getip.aspx]]></content>
-      <categories>
-        <category>linux</category>
-        <category>ubuntu</category>
-      </categories>
-      <tags>
-        <tag>linux</tag>
-        <tag>ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title><![CDATA[ubuntu_系统常规配置]]></title>
-    <url>%2F2017%2F05%2F17%2Fubuntu_%E7%B3%BB%E7%BB%9F%E5%B8%B8%E8%A7%84%E9%85%8D%E7%BD%AE%2F</url>
-    <content type="text"><![CDATA[ubuntu 文件传输、语言环境、远程桌面安装 系统常规配置文件传输安装 lrzsz 1apt install lrzsz bash命令行输入 rz -e ：打开当前终端文件进行传输 sz -e 文件在远程机器上路径:打开当前终端选择下载文件位置 语言环境bash终端 查看当前系统的语言环境 locale 查看当前系统已安装的语言 locale -a 切换（并自动安装）对应选择的默认语言 sudo dpkg-reconfigure locales 安装缺少的语言 sudo locale-gen zh_CN.UTF-8 编辑配置文件 1234ubuntu@VM-14-193-ubuntu:~$ vim ~/.profile# 添加下面内容export LANG="zh_CN.UTF-8"export LC_ALL="zh_CN.UTF-8" 远程桌面安装文泉驿字体 apt install wqy* -y xfce4 解压缩工具安装命令: 1apt install thunar-archive-plugin -y 文本编辑器安装命令: 1apt install gedit -y 或 1apt install mousepad -y xfce4 软件包列表其中依赖必需的包在你执行apt-get iinstall xfce4的时候就已经完成安装了 除了Lib库文件、主要有以下的包 1234567891011121314151617gtk2-engines-xfce GTK+-2.0 对于Xfce的主题显示支持 orage Xfce 桌面环境的日历和时间管理thunar Xfce 的文件管理器 xfce4-appfinder Xfce中运行命令和应用程序查找、就是应用程序菜单第一个项目xfce4-mixer Xfce中的混音器、简单说就是音量外放和话题之类的控制xfce4-panel Xfce中的面板管理器xfce4-session Xfce中的会话管理器 xfce4-settings Xfce中的设置（是指图形界面的设置、就是打开菜单能看到的那个设置）xfce4-utils Xfce中各个方面的工具xfconf Xfce设置管理器中的实用工具xfdesktop4 xfce的桌面背景、图标、还有菜单管理都由这个提供xfwm4 Xfce中的视窗管理器desktop-base Debian 桌面环境的公共基础tango-icon-theme Tango 主题图标 thunar-volman Thunar 文件管理器的音量控制扩展 xfce4-notifyd 可视化的通知守护进程 以上这些软件包是你在安装Xfce4的时候因为依赖安装的包、其中最后的三个在Debian软件仓库里面是提示推荐的包。 下面说下Xfce中可以用来扩充功能的包、就是这些包在最小化配置的时候不会默认安装好、但是没有它们有些功能不能使用 xfprint4 Xfce4 桌面环境下使用的打印机管理器。 Xfce4-goodies是由下面的包填充的、也就是说、你安装 xfce4-goodies其实是安装的下面这些软件包 12345678910111213141516171819202122232425262728293031323334353637383940414243444546xfce4-artwork Xfce桌面环境美化的扩展包、会安装一些图标、主题、壁纸xfce4-battery-plugin 电池电量的显示器xfce4-clipman-plugin 剪切板历史记录查看xfce4-cpufreq-plugin 设置CPU频率xfce4-cpugraph-plugin CPU利用率查看xfce4-datetime-plugin 日期和时间插件xfce4-diskperf-plugin 磁盘情况监控xfce4-fsguard-plugin 文件系统监控xfce4-genmon-plugin 显示一些命令提示xfce4-mailwatch-plugin 邮件通知xfce4-mount-plugin 挂载管理xfce4-netload-plugin 网络xfce4-notes-plugin 笔记xfce4-places-plugin 快速管理收藏夹、最近使用、可移除驱动器xfce4-quicklaunchers 快速启动xfce4-sensors-plugin 传感器、可以查看硬件温度xfce4-smartbookmark-plugin 收藏夹xfce4-systemload-plugin 系统加载项查看xfce4-timer-plugin 计时器xfce4-verve-plugin 提供命令记忆功能xfce4-wavelan-plugin 无线网运行情况xfce4-weather-plugin 天气预报xfce4-xkb-plugin 键盘配置thunar-archive-plugin 压缩文件的解压插件thunar-media-tags-plugin 提供媒体文件标签功能mousepad 一个简单的文本编辑器ristretto 图像查看器xfburn DVD刻录软件xfce4-dict 词典xfce4-notifyd 通知xfce4-screenshooter 截图xfce4-taskmanager 任务管理器xfce4-terminal 终端xfce4-cellmodem-plugin 调制解调器xfce4-linelight-plugin 一个搜索程序xfce4-messenger-plugin DBus消息通知xfce4-minicmd-plugin 额外的终端软件xfce4-mpc-plugin, xfmpc Music Player Daemon播放器守护程序，管理播放列表和音乐数据库xfce4-radio-plugin 收音机插件xfce4-xfapplet-plugin 提供GNOME环境中的一些小应用程序支持xfswitch-plugin 用户快速切换xfce4-hdaps ThinkPads的HDAPS插件thunar-thumbnailers 为文件管理器提供图像预览功能gigolo GIO/GVfs虚拟文件系统的远程管理前端parole 视频播放器xfce4-power-manager 电源管理 以上软件包可以单独安装的、所以看你需要添加即可]]></content>
       <categories>
         <category>linux</category>
         <category>ubuntu</category>
